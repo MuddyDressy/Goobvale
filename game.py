@@ -34,6 +34,7 @@ hatslot = "empty"
 shoesslot = "empty"
 diamondbouquetstatus = False
 debug = False
+money = 0
 def main():
     global justfound, pet, houselevel, item1, item2, item1name, item2name, diamondflowerstatus, hatslot, shoesslot, diamondbouquetstatus, debug
     whatdoyoudo = input("what do you want to do? (type 'help' for a list of commands): ")
@@ -66,6 +67,8 @@ def main():
             print("giveitem [name] - gives you an item, only works in debug mode")
         print("hat - shows your hat")
         print("shoes - shows your shoes")
+        print("money - shows your money")
+        print("lake - find a lake")
     elif whatdoyoudo.startswith("inventory "): # inventory [1-20] - shows your inventory
         slot = whatdoyoudo.split(" ")[1]
         if slot.isdigit() and 1 <= int(slot) <= 20:
@@ -232,8 +235,25 @@ def main():
             print("You find a tree, but you see a cat just chilling near it")
             justfound = "mystics cat"
         else:
-            print("You find a tree, you break it and find some wood!")
-            justfound = "wood"
+            if random.randint(1, 100) <= 10:
+                print("you find a tree, but it was wisdom tree")
+                givemoney = input("do you want to give money to the wisdom tree to get wisdom? (yes/no): ")
+                if givemoney == "yes":
+                    if money >= 10:
+                        money -= 10
+                        print("you give the wisdom tree 10 money")
+                        print("his wisdom is...")
+                        wisdom = random.choice(["you cant win without losing first", "the journey is more important than the destination", "dont cry over spilled milk", "a rolling stone gathers no moss", "actions speak louder than words", "you are what you eat", "the early bird catches the worm", "you miss 100% of the shots you dont take", "when one door closes another opens", "fortune favors the bold", "the only way to get to your dreams is to work hard for them", "you can do anything you set your mind to", "the best things in life are free", "you cant make a cake and eat it too", "a picture is worth a thousand words", "when the going gets tough the tough get going", "two wrongs dont make a right", "the grass is always greener on the other side", "you cant judge a book by its cover", "if it aint broke dont fix it", "beauty is in the eye of the beholder", "losing doesnt mean you are a failure, it just means your learning", "the key to success is to never give up", "the best way to predict the future is to create it", "i forgot what he was going to say, so ill just give you the money back", "the secret to getting job is to get a job that rewards you for what you love doing", "the secret to happiness is to be happy with what you have already acomplished"])
+                        print(wisdom)
+                        if wisdom == "i forgot what he was going to say, so ill just give you the money back":
+                            money += 10
+                    else:
+                        print("you dont have enough money to give the wisdom tree, you need at least 10 money to get wisdom from the wisdom tree.")
+                else:
+                    print("you don't give the wisdom tree any money and it ignores you.")
+            else:
+                print("You find a tree, you break it and find some wood!")
+                justfound = "wood"
     elif whatdoyoudo == "rock": # rock - find a rock
         print("You find a rock!")
         justfound = "rock"
@@ -247,7 +267,7 @@ def main():
         if justfound == "nothing":
             print("There is nothing to pick up.")
         elif justfound == "evil ore":
-            print("You pick up evil ore")
+            print("You pick up the evil ore")
             print("what do you want to do? (type 'help' for a list of commands): ")
             time.sleep(2)
             print("you cant seem to type...")
@@ -291,7 +311,7 @@ def main():
             item1 = int(parts[1])
             item2 = int(parts[2])
             if 1 <= item1 <= 20 and 1 <= item2 <= 20:
-                if globals().get(f"inventoryslot{item1}") == "empty" and globals().get(f"inventoryslot{item2}") == "empty":
+                if globals().get(f"inventoryslot{item1}") == "empty" and globals().get(f"inventoryslot{item2}") == "empty": # pi line cause its 314th line of code and pi is 3.14
                     print("Both slots are empty. you need 2 items to craft.")
                 else:
                     if globals().get(f"inventoryslot{item1}") == "empty":
@@ -311,7 +331,6 @@ def main():
                             crafting("wood", "ruby ore", "ruby pickaxe") or
                             crafting("wood", "mythril ore", "mythril pickaxe") or
                             crafting("wood", "adamantite ore", "adamantite pickaxe") or
-                            crafting("pi", "pi", "this line of code is pi cause this is the 314th line") or
                             crafting("a rabbit", "gem", "a magic rabbit") or
                             crafting("flower", "flower", "bouquet") or
                             crafting("rock", "rock", "boulder") or
@@ -324,7 +343,6 @@ def main():
                             crafting("diamond ore", "flower", "diamond flower") or
                             crafting("diamond flower", "diamond flower", "diamond bouquet")
                         )
-
                         if not crafted_any:
                             print("These items cannot be crafted together.")
             else:
@@ -415,14 +433,14 @@ def main():
         else:
             print("You find a lake, type 'pickup' to collect some water.")
             justfound = "bottle of water"
-    elif whatdoyoudo == "giveitem [name]": # gives a item to you no mater what (debug command)
+    elif whatdoyoudo.startswith("giveitem "): # gives a item to you no mater what (debug command)
         if debug:
-            itemname = whatdoyoudo[11:]
+            itemname = whatdoyoudo[9:]
             justfound = itemname
             if justfound == "nothing":
                 print("There is nothing to pick up.")
             elif justfound == "evil ore":
-                print("You pick up evil ore")
+                print("You get evil ore")
                 print("what do you want to do? (type 'help' for a list of commands): ")
                 time.sleep(2)
                 print("you cant seem to type...")
@@ -436,13 +454,14 @@ def main():
                 for i in range(1, 21):
                     if globals().get(f"inventoryslot{i}") == "empty":
                         globals()[f"inventoryslot{i}"] = justfound
-                        print(f"You pick up the {justfound}.")
+                        print(f"You get{justfound}.")
                         print(f"it was placed in slot {i}")
                         justfound = "nothing"
                         break
                 else:
                     print("Your inventory is full. You can't get this item.")
-            
+    elif whatdoyoudo == "money":
+        print(f"You have {money} money.")
     else: # if the command is not recognized, show an error message
         print("Invalid command. Type 'help' for a list of commands.")
 def mine(pickaxetype):
@@ -488,8 +507,9 @@ def loadgame():
         try:
             with open(loadwhere, "r") as f:
                 data = json.load(f)
-                for i in range(1, 21):
-                    globals()[f"inventoryslot{i}"] = data.get("inventory", ["empty"]*20)[i-1]
+                inv = data.get("inventory", ["empty"]*20)
+                for i in range(20):
+                    globals()[f"inventoryslot{i+1}"] = inv[i] if i < len(inv) else "empty"
                 pet = data.get("pet", "none")
                 justfound = data.get("justfound", "nothing")
                 houselevel = data.get("houselevel", 0)
@@ -498,6 +518,7 @@ def loadgame():
                 shoesslot = data.get("shoesslot", "empty")
                 diamondbouquetstatus = data.get("diamondbouquetstatus", False)
                 debug = data.get("debug", False)
+                money = data.get("money", 0)
             print("Progress loaded.")
         except FileNotFoundError:
             print("File not found. Please check the file path and try again.")
@@ -518,7 +539,8 @@ def savegame():
                 "shoesslot": shoesslot,
                 "diamondbouquetstatus": diamondbouquetstatus,
                 "diamondflowerstatus": diamondflowerstatus,
-                "debug": debug
+                "debug": debug,
+                "money": money
             }, f)
         print("Progress saved.")
 

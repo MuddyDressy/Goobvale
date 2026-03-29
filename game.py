@@ -35,12 +35,77 @@ shoesslot = "empty"
 diamondbouquetstatus = False
 debug = False
 money = 0
+items = {
+    ## Basic Items
+
+    "rock": 0.1,
+    "flower": 0.1,
+    "wood": 0.2,
+    "sand": 0.1,
+    "glass": 1.3,
+    "boulder": 0.3,
+
+    ## Gems and Treasure Chain
+
+    "gem": 1,
+    "big gem": 2.2,
+    "treasure box": 11.5,
+    # diamond ore used to be here but i dont want duplicates so its only in the mining area of the items dictinary now
+
+    ## Pickaxes
+
+    "stone pickaxe": 0.5,
+    "iron pickaxe": 1.4,
+    "gold pickaxe": 5.4,
+    "diamond pickaxe": 10.5,
+    "emerald pickaxe": 15.5,
+    "ruby pickaxe": 20.6,
+    "mythril pickaxe": 50.8,
+    "adamantite pickaxe": 76,
+
+    ## Pets
+
+    # pets are unbuyable and unsellable (yeah... i know you think the pets should be buyable and sellable at like $1000 but i think that would break the economy of the game so thats why i put them in a diffrent list)
+
+    ## Pet Related Items
+
+    "bouquet": 0.4,
+    "diamond bouquet": 21.6,
+    "diamond flower": 10.6,
+    "glasses": 2,
+
+    ## Other
+    "magic wand": 1.4,
+    "bottle of water": 0.1,
+
+    ## Minerals/Ores
+
+    "coal": 1,
+    "iron ore": 3,
+    "gold ore": 7.5,
+    "diamond ore": 10,
+    "emerald ore": 15,
+    "ruby ore": 20,
+    "sapphire ore": 15,
+    "evil ore": 30,
+    "mythril ore": 50,
+    "adamantite ore": 75
+}
+
+pets = [
+    "a rabbit",
+    "a magic rabbit",
+    "a cool rabbit",
+    "a cool magic rabbit",
+    "mystics cat",
+    "a axolotl"
+]
 def main():
     global justfound, pet, houselevel, item1, item2, item1name, item2name, diamondflowerstatus, hatslot, shoesslot, diamondbouquetstatus, debug
     whatdoyoudo = input("what do you want to do? (type 'help' for a list of commands): ")
     if whatdoyoudo == "help": # help command, shows a list of commands
         print("help - shows this message")
-        print("inventory [1-20] - shows your inventory")
+        print("inventory [1-20] - shows whats in that specific inventory slot (put no number to see whats in all inventory slots)")
         print("use [1-20] - uses an item in your inventory")
         print("tree - find a tree")
         print("rock - find a rock")
@@ -65,10 +130,12 @@ def main():
             print("reset all - resets all progress, including pet, house level, inventory, and all other progress")
             print("debug - toggles debug mode, which shows debug commands and allows you to use debug commands if it is on")
             print("giveitem [name] - gives you an item, only works in debug mode")
+            print("givemoney [amount] - gives you money, only works in debug mode")
         print("hat - shows your hat")
         print("shoes - shows your shoes")
         print("money - shows your money")
         print("lake - find a lake")
+        print("shop - buy and sell items")
     elif whatdoyoudo.startswith("inventory "): # inventory [1-20] - shows your inventory
         slot = whatdoyoudo.split(" ")[1]
         if slot.isdigit() and 1 <= int(slot) <= 20:
@@ -90,10 +157,13 @@ def main():
                 globals()[f"inventoryslot{slot}"] = "empty"
                 justfound = "flower"
             elif item == "wood":
-                print("You use the wood to make a house.")
-                justfound = "nothing"
-                houselevel == 1
-                globals()[f"inventoryslot{slot}"] = "empty"
+                if houselevel > 0:
+                    print("you already have a house, you dont need to use the wood to make another one.")
+                else:
+                    print("You use the wood to make a house.")
+                    justfound = "nothing"
+                    houselevel = 1
+                    globals()[f"inventoryslot{slot}"] = "empty"
             elif item == "gem":
                 print("You use the gem and it leads you to a hidden treasure! but then breaks.")
                 justfound = "treasure box"
@@ -178,7 +248,7 @@ def main():
                 if pet == "none":
                     pet = "a cool magic rabbit"
             elif item == "coal" or item == "iron ore" or item == "gold ore" or item == "diamond ore" or item == "emerald ore" or item == "ruby ore" or item == "sapphire ore" or item == "evil ore" or item == "mythril ore" or item == "adamantite ore":
-                print("you cannot use a mineral, it can only be crafted with other items")
+                print("you cannot use a mineral, it can only be crafted with other items or sold for money.")
             elif item == "sand":
                 print("you play with the sand for a bit")
             elif item == "glass":
@@ -189,11 +259,6 @@ def main():
                     houselevel = 2
                 else:
                     print("you look at the glass but dont know what to do with it.")
-            elif item == "mystics cat":
-                print("You pet mystics cat, it seems happy and becomes your pet. it also tells you about a game called geometry dash and how they play it a lot.")
-                globals()[f"inventoryslot{slot}"] = "empty"
-                if pet == "none":
-                    pet = "mystics cat"
             elif item == "diamond flower":
                 if pet == "none":
                     print("you cannot use the diamond flower without a pet, it just looks pretty in your inventory.")
@@ -213,6 +278,9 @@ def main():
                 globals()[f"inventoryslot{slot}"] = "empty"
                 if pet == "none":
                     pet = "a axolotl"
+            elif item == "bottle of water":
+                print("You drink the bottle of water and feel refreshed.")
+                globals()[f"inventoryslot{slot}"] = "empty"
             else:
                 print(f"the item you are using is unknown, the item is being deleted incase you cheated it in or something.")
                 justfound = "nothing"
@@ -311,7 +379,7 @@ def main():
             item1 = int(parts[1])
             item2 = int(parts[2])
             if 1 <= item1 <= 20 and 1 <= item2 <= 20:
-                if globals().get(f"inventoryslot{item1}") == "empty" and globals().get(f"inventoryslot{item2}") == "empty": # pi line cause its 314th line of code and pi is 3.14
+                if globals().get(f"inventoryslot{item1}") == "empty" and globals().get(f"inventoryslot{item2}") == "empty":
                     print("Both slots are empty. you need 2 items to craft.")
                 else:
                     if globals().get(f"inventoryslot{item1}") == "empty":
@@ -433,7 +501,7 @@ def main():
         else:
             print("You find a lake, type 'pickup' to collect some water.")
             justfound = "bottle of water"
-    elif whatdoyoudo.startswith("giveitem "): # gives a item to you no mater what (debug command)
+    elif whatdoyoudo.startswith("giveitem "): # giveitem [name] - gives a item to you no mater what (debug command)
         if debug:
             itemname = whatdoyoudo[9:]
             justfound = itemname
@@ -454,14 +522,59 @@ def main():
                 for i in range(1, 21):
                     if globals().get(f"inventoryslot{i}") == "empty":
                         globals()[f"inventoryslot{i}"] = justfound
-                        print(f"You get{justfound}.")
+                        print(f"You get {justfound}.")
                         print(f"it was placed in slot {i}")
                         justfound = "nothing"
                         break
                 else:
                     print("Your inventory is full. You can't get this item.")
-    elif whatdoyoudo == "money":
+    elif whatdoyoudo == "money": # money - shows your money
         print(f"You have {money} money.")
+    elif whatdoyoudo == "inventory": # inventory - shows all your inventory slots and what is in them
+        for i in range(1, 21):
+            print(f"Slot {i}: {globals().get(f'inventoryslot{i}')}")
+    elif whatdoyoudo == "shop":
+        buyorsell = input("do you want to buy or sell items? (buy/sell): ")
+        if buyorsell == "buy":
+            itemtobuy = input("What would you like to buy? (type the name of the item you want to buy, or type 'exit' to exit the shop): ")
+            if itemtobuy == "exit":
+                print("Thanks for visiting the shop!")
+            elif itemtobuy in items:
+                if money >= items[itemtobuy]:
+                    money -= items[itemtobuy]
+                    justfound = itemtobuy
+                    print(f"You bought {itemtobuy} for {items[itemtobuy]} money. type 'pickup' to pick it up.")
+                else:
+                    print(f"You don't have enough money to buy this item. the price of the item is {items[itemtobuy]} money.")
+            else:
+                print("This item is not available for purchase, if it is a pet, pets are not allowed to be sold or bought in the shop.")
+        elif buyorsell == "sell":
+            itemtosell = input("type the slot that the item you want to sell is in (type a number between 1 and 20, or type 'exit' to exit the shop): ")
+            if itemtosell == "exit":
+                print("Thanks for visiting the shop!")
+            elif itemtosell.isdigit() and 1 <= int(itemtosell) <= 20:
+                itemtosell = int(itemtosell)
+                if globals().get(f"inventoryslot{itemtosell}") == "empty":
+                    print("That slot is empty. you have nothing to sell in that slot.")
+                else:
+                    itemsellname = globals().get(f"inventoryslot{itemtosell}")
+                    if itemsellname in items:
+                        money += items[itemsellname]
+                        print(f"You sold {itemsellname} for {items[itemsellname]} money.")
+                        globals()[f"inventoryslot{itemtosell}"] = "empty"
+                    else:
+                        print("This item cannot be sold as it is not in the shop's inventory, if it is a pet, pets are not allowed to be sold or bought in the shop.")
+            else:
+                print("Invalid inventory slot. Please enter a number between 1 and 20, or type 'exit' to exit the shop.")
+    elif whatdoyoudo == "givemoney [amount]": # give money to the player
+        if debug:
+            amount = input("How much money do you want to give? (enter a number): ")
+            if amount.isdigit():
+                amount = int(amount)
+                money += amount
+                print(f"You received {amount} money.")
+            else:
+                print("Invalid amount. Please enter a valid number.")
     else: # if the command is not recognized, show an error message
         print("Invalid command. Type 'help' for a list of commands.")
 def mine(pickaxetype):

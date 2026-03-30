@@ -5,7 +5,7 @@ in goobvale, you can go find things like trees, lakes, rock, you can also mine, 
 
 one thing to note is that you need to remember to pick up everything, it never auto pick ups
 
-# Example Gameplay
+# Example Gameplay:
 Do you want to load a save? (yes/no): no
 
 what do you want to do? (type 'help' for a list of commands): rock  

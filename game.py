@@ -2,6 +2,7 @@ import json
 import time
 import random
 import sys
+import requests
 inventoryslot1 = "empty"
 inventoryslot2 = "empty"
 inventoryslot3 = "empty"
@@ -101,7 +102,7 @@ pets = [
     "a axolotl"
 ]
 def main():
-    global justfound, pet, houselevel, item1, item2, item1name, item2name, diamondflowerstatus, hatslot, shoesslot, diamondbouquetstatus, debug
+    global justfound, pet, houselevel, item1, item2, item1name, item2name, diamondflowerstatus, hatslot, shoesslot, diamondbouquetstatus, debug, money
     whatdoyoudo = input("what do you want to do? (type 'help' for a list of commands): ")
     if whatdoyoudo == "help": # help command, shows a list of commands
         print("help - shows this message")
@@ -332,6 +333,8 @@ def main():
         print("You find a flower!")
         justfound = "flower"
     elif whatdoyoudo == "pickup": # pickup - picks up what ever you just found
+        if justfound == "shopkeeper":
+            shopkeeperstole = True
         if justfound == "nothing":
             print("There is nothing to pick up.")
         elif justfound == "evil ore":
@@ -529,11 +532,11 @@ def main():
                 else:
                     print("Your inventory is full. You can't get this item.")
     elif whatdoyoudo == "money": # money - shows your money
-        print(f"You have {money} money.")
+        print(f"You have {round(money, 2)} money.")
     elif whatdoyoudo == "inventory": # inventory - shows all your inventory slots and what is in them
         for i in range(1, 21):
             print(f"Slot {i}: {globals().get(f'inventoryslot{i}')}")
-    elif whatdoyoudo == "shop":
+    elif whatdoyoudo == "shop": # shop - buy and sell items
         buyorsell = input("do you want to buy or sell items? (buy/sell): ")
         if buyorsell == "buy":
             itemtobuy = input("What would you like to buy? (type the name of the item you want to buy, or type 'exit' to exit the shop): ")
@@ -575,6 +578,15 @@ def main():
                 print(f"You received {amount} money.")
             else:
                 print("Invalid amount. Please enter a valid number.")
+    elif whatdoyoudo.startswith("runcode "): # runcode - runs code that is only for testing and debugging purposes, it is not meant to be used by players and can break the game if used incorrectly
+        if debug:
+            code = whatdoyoudo[8:]
+            try:
+                exec(code)
+                print("Code executed successfully:")
+                print(code)
+            except Exception as e:
+                print(f"An error occurred while executing the code: {e}")
     else: # if the command is not recognized, show an error message
         print("Invalid command. Type 'help' for a list of commands.")
 def mine(pickaxetype):

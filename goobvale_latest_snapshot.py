@@ -36,6 +36,7 @@ shoesslot = "empty"
 diamondbouquetstatus = False
 debug = False
 money = 0
+draw = "notdrawn"
 items = {
     ## Basic Items
 
@@ -78,6 +79,8 @@ items = {
     ## Other
     "magic wand": 1.4,
     "bottle of water": 0.1,
+    "paper": 5,
+    "crafting recipe book": 15.7,
 
     ## Minerals/Ores
 
@@ -102,7 +105,7 @@ pets = [
     "a axolotl"
 ]
 def main():
-    global justfound, pet, houselevel, item1, item2, item1name, item2name, diamondflowerstatus, hatslot, shoesslot, diamondbouquetstatus, debug, money
+    global justfound, pet, houselevel, item1, item2, item1name, item2name, diamondflowerstatus, hatslot, shoesslot, diamondbouquetstatus, debug, money, draw
     whatdoyoudo = input("what do you want to do? (type 'help' for a list of commands): ")
     if whatdoyoudo == "help": # help command, shows a list of commands
         print("help - shows this message")
@@ -130,13 +133,17 @@ def main():
             print("reset inventory - resets your inventory and makes all inventory slots empty")
             print("reset all - resets all progress, including pet, house level, inventory, and all other progress")
             print("debug - toggles debug mode, which shows debug commands and allows you to use debug commands if it is on")
-            print("giveitem [name] - gives you an item, only works in debug mode")
-            print("givemoney [amount] - gives you money, only works in debug mode")
+            print("giveitem [name] - gives you an item")
+            print("givemoney [amount] - gives you money")
+            print("draw - lets you draw on a piece of paper")
+            print("seedrawing - shows your drawing if you have drawn on the paper")
         print("hat - shows your hat")
         print("shoes - shows your shoes")
         print("money - shows your money")
         print("lake - find a lake")
         print("shop - buy and sell items")
+        print("value [item name] - shows the value of an item, only works if the item is in the shop")
+        print("shopitems - shows a list of items in the shop")
     elif whatdoyoudo.startswith("inventory "): # inventory [1-20] - shows your inventory
         slot = whatdoyoudo.split(" ")[1]
         if slot.isdigit() and 1 <= int(slot) <= 20:
@@ -282,6 +289,42 @@ def main():
             elif item == "bottle of water":
                 print("You drink the bottle of water and feel refreshed.")
                 globals()[f"inventoryslot{slot}"] = "empty"
+            elif item == "paper":
+                if draw != "notdrawn":
+                    drawornot = input("you've already drawn on the paper, do you want to overwrite your drawing or look at it? (overwrite/look): ")
+                    if drawornot == "overwrite":
+                        draw = "notdrawn"
+                    elif drawornot == "look":
+                        for row in draw:
+                            print(" ".join("▢" if cell == " " else cell for cell in row))
+                elif draw == "notdrawn":
+                    print("you wanna draw on the paper, so lets see what you can do...")
+                    draw()
+            elif item == "crafting recipe book":
+                print("the crafting recipe book has the following crafting recipes in it:")
+                print("wood + gem = magic wand")
+                print("wood + rock = stone pickaxe")
+                print("wood + iron ore = iron pickaxe")
+                print("wood + diamond ore = diamond pickaxe")
+                print("wood + gold ore = gold pickaxe")
+                print("wood + emerald ore = emerald pickaxe")
+                print("wood + ruby ore = ruby pickaxe")
+                print("wood + mythril ore = mythril pickaxe")
+                print("wood + adamantite ore = adamantite pickaxe")
+                print("a rabbit + gem = a magic rabbit")
+                print("flower + flower = bouquet")
+                print("rock + rock = boulder")
+                print("gem + gem = big gem")
+                print("wood + glass = glasses")
+                print("a rabbit + glasses = a cool rabbit")
+                print("a magic rabbit + glasses = a cool magic rabbit")
+                print("coal + sand = glass")
+                print("a cool rabbit + gem = a cool magic rabbit")
+                print("diamond ore + flower = diamond flower")
+                print("diamond flower + diamond flower = diamond bouquet")
+                print("wood + bottle of water = paper")
+                print("wood + paper = crafting recipe book")
+
             else:
                 print(f"the item you are using is unknown, the item is being deleted incase you cheated it in or something.")
                 justfound = "nothing"
@@ -412,7 +455,9 @@ def main():
                             crafting("coal", "sand", "glass") or
                             crafting("a cool rabbit", "gem", "a cool magic rabbit") or
                             crafting("diamond ore", "flower", "diamond flower") or
-                            crafting("diamond flower", "diamond flower", "diamond bouquet")
+                            crafting("diamond flower", "diamond flower", "diamond bouquet") or
+                            crafting("wood", "bottle of water", "paper") or
+                            crafting("wood", "paper", "crafting recipe book")
                         )
                         if not crafted_any:
                             print("These items cannot be crafted together.")
@@ -587,8 +632,28 @@ def main():
                 print(code)
             except Exception as e:
                 print(f"An error occurred while executing the code: {e}")
+    elif whatdoyoudo.startswith("value "): # value [item name] - shows the value of an item, only works if the item is in the shop
+        itemname = whatdoyoudo[6:]
+        if itemname in items:
+            print(f"The value of {itemname} is {items[itemname]} money.")
+        else:
+            print("This item is not in the shop, so its value cannot be determined.")
+    elif whatdoyoudo == "draw": # draw - lets you draw on a piece of paper (debug command)
+        if debug:
+            print("lets see what you can draw...")
+            draw()
+    elif whatdoyoudo == "seedrawing": # seedrawing - shows your drawing if you have drawn on the paper (debug command)
+        if debug:
+            print("your drawing is:")
+            for row in draw:
+                print(" ".join("▢" if cell == " " else cell for cell in row))
+    elif whatdoyoudo == "shopitems": # shopitems - shows all the items that are in the shop
+        print("the shop has the following items for sale:")
+        for item, price in items.items():
+            print(f"{item}: {price} money")
     else: # if the command is not recognized, show an error message
         print("Invalid command. Type 'help' for a list of commands.")
+
 def mine(pickaxetype):
     global justfound
     if pickaxetype == "stone":
@@ -681,6 +746,55 @@ def crafting(firstitem, seconditem, resultitem):
         print(f"The crafted item has been placed in slot {item1}.")
         return True
     return False
+
+def draw():
+    global draw
+    canvassize = input("type a width and height for your drawing canvas between 1 and 10 (for example, '5 5' for a 5 by 5 canvas): ")
+    canvaswidth = canvassize.split(" ")[0]
+    canvasheight = canvassize.split(" ")[1]
+    if canvaswidth.isdigit() and canvasheight.isdigit():
+        canvaswidth = int(canvaswidth)
+        canvasheight = int(canvasheight)
+        if 1 <= canvaswidth <= 10 and 1 <= canvasheight <= 10:
+            canvas = [[" " for _ in range(canvaswidth)] for _ in range(canvasheight)]
+            for row in canvas:
+                print(" ".join("▢" if cell == " " else cell for cell in row))
+        else:
+            print("Width and height must be between 1 and 10.")
+    else:
+        print("Invalid input. Please enter numbers only.")
+    draw = input("type 'draw [x] [y]' to draw on the canvas (type erase instead of draw to erase), where x is the width and y is the height from the top left corner (for example, 'draw 2 3' to draw on the 2nd column and 3rd row), type 'done' to finish: ")
+    while draw != "done":
+        if draw.startswith("draw ") or draw == "done":
+            parts = draw.split(" ")
+            if len(parts) == 3 and parts[1].isdigit() and parts[2].isdigit():
+                x = int(parts[1]) - 1
+                y = int(parts[2]) - 1
+                if 0 <= x < canvaswidth and 0 <= y < canvasheight:
+                    canvas[y][x] = "▨"
+                    for row in canvas:
+                        print(" ".join("▢" if cell == " " else cell for cell in row))
+                else:
+                    print("Coordinates out of bounds. Please enter values within the canvas size.")
+            else:
+                print("Invalid command format. Use 'draw [x] [y]' with valid numbers.")
+        elif draw.startswith("erase ") or draw == "done":
+            parts = draw.split(" ")
+            if len(parts) == 3 and parts[1].isdigit() and parts[2].isdigit():
+                x = int(parts[1]) - 1
+                y = int(parts[2]) - 1
+                if 0 <= x < canvaswidth and 0 <= y < canvasheight:
+                    canvas[y][x] = "▢"
+                    for row in canvas:
+                        print(" ".join("▢" if cell == " " else cell for cell in row))
+                else:
+                    print("Coordinates out of bounds. Please enter values within the canvas size.")
+            else:
+                print("Invalid command format. Use 'erase [x] [y]' with valid numbers.")
+        else:
+            print("Invalid command. Type 'draw [x] [y]' to draw or 'done' to finish.")
+        draw = input("type 'draw [x] [y]' to draw on the canvas (type erase instead of draw to erase), where x is the width and y is the height from the top left corner (for example, 'draw 2 3' to draw on the 2nd column and 3rd row), type 'done' to finish: ")
+    draw = canvas
 
 loadgame()
 while True:

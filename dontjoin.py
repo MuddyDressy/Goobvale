@@ -376,8 +376,6 @@ def main():
         print("You find a flower!")
         justfound = "flower"
     elif whatdoyoudo == "pickup": # pickup - picks up what ever you just found
-        if justfound == "shopkeeper":
-            shopkeeperstole = True
         if justfound == "nothing":
             print("There is nothing to pick up.")
         elif justfound == "evil ore":
@@ -797,5 +795,8 @@ def draw():
     draw = canvas
 
 loadgame()
-while True:
-    main()
+if input("you must know the secret code to play... type it here to play: ") == "theyhavefoundus...":
+    while True:
+        main()
+else:
+    print("Incorrect code. Access denied.")
